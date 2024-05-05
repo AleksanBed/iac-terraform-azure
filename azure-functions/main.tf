@@ -1,14 +1,14 @@
 resource "azurerm_resource_group" "example" {
-	name = "example-resource"
-	location = "West Europe"
+	name = var.resource_group_name
+	location = var.resource_group_location
 }
 
 resource "azurerm_storage_account" "example" {
-	name = "storageaccountname"
+	name = var.storage_account_name
 	resource_group_name = azurerm_resource_group.example.name
 	location = azurerm_resource_group.example.location
-	account_tier = "Standard"
-	account_replication_type = "GRS"
+	account_tier = var.storage_account_tier
+	account_replication_type = var.storage_account_replication_type
 	
 	tags = {
 		environment = "staging"
@@ -16,18 +16,17 @@ resource "azurerm_storage_account" "example" {
 }
 
 resource "azurerm_service_plan" "example" {
-	name = "example-service"
-	resource_group_name = azurerm_resource_grup.example.name
+	name = var.service_plan_name
+	resource_group_name = azurerm_resource_group.example.name
 	location = azurerm_resource_group.example.location
 	os_type = "Linux"
-	sku_name = "P1v2"
+	sku_name = var.service_plan_sku_name
 }
 
 resource "azurerm_linux_function_app" "example" {
-	name = "example-linux-func-app"
-	resource_group_name = azurerm_resource_grup.example.name
+	name = var.function_app_name
+	resource_group_name = azurerm_resource_group.example.name
         location = azurerm_resource_group.example.location
-	
 	storage_account_name = azurerm_storage_account.example.name
 	storage_account_access_key = azurerm_storage_account.example.primary_access_key
 	service_plan_id = azurerm_service_plan.example.id
@@ -36,9 +35,9 @@ resource "azurerm_linux_function_app" "example" {
 }
 
 resource "azurerm_function_app_function" "example" {
-  name            = "example-function-app-function"
+  name            = var.function_name
   function_app_id = azurerm_linux_function_app.example.id
-  language        = "Python"
+  language        = var.function_app_language
   test_data = jsonencode({
     "name" = "Azure"
   })
@@ -47,10 +46,7 @@ resource "azurerm_function_app_function" "example" {
       {
         "authLevel" = "function"
         "direction" = "in"
-        "methods" = [
-          "get",
-          "post",
-        ]
+        "methods" = var.function_http_methods
         "name" = "req"
         "type" = "httpTrigger"
       },
