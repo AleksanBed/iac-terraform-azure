@@ -16,15 +16,15 @@ resource "azurerm_storage_account" "example" {
 }
 
 resource "azurerm_storage_container" "example" {
-  name                  = "vhds"
+  name                  = var.storage_container_name
   storage_account_name  = azurerm_storage_account.example.name
-  container_access_type = "private"
+  container_access_type = var.container_access_type
 }
 
 resource "azurerm_storage_blob" "example" {
-  name                   = "content.zip"
+  name                   = var.blob_name
   storage_account_name   = azurerm_storage_account.example.name
   storage_container_name = azurerm_storage_container.example.name
   type                   = "Block"
-  source                 = "some-local-file.zip"
+  source                 = var.source_file_path
 }
